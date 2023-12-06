@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		4CA8F2472B1FEE680061E838 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CA8F2462B1FEE680061E838 /* main.cpp */; };
 		4CA8F24F2B1FEEB10061E838 /* Day01.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CA8F24D2B1FEEB10061E838 /* Day01.cpp */; };
+		4CA8F2512B2003750061E838 /* Day02.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CA8F2502B2003750061E838 /* Day02.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -28,6 +29,7 @@
 		4CA8F2462B1FEE680061E838 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		4CA8F24D2B1FEEB10061E838 /* Day01.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Day01.cpp; sourceTree = "<group>"; };
 		4CA8F24E2B1FEEB10061E838 /* Day01.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = Day01.hpp; sourceTree = "<group>"; };
+		4CA8F2502B2003750061E838 /* Day02.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Day02.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +65,7 @@
 				4CA8F2462B1FEE680061E838 /* main.cpp */,
 				4CA8F24D2B1FEEB10061E838 /* Day01.cpp */,
 				4CA8F24E2B1FEEB10061E838 /* Day01.hpp */,
+				4CA8F2502B2003750061E838 /* Day02.cpp */,
 			);
 			path = AdventOfCode;
 			sourceTree = "<group>";
@@ -126,6 +129,7 @@
 			files = (
 				4CA8F2472B1FEE680061E838 /* main.cpp in Sources */,
 				4CA8F24F2B1FEEB10061E838 /* Day01.cpp in Sources */,
+				4CA8F2512B2003750061E838 /* Day02.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

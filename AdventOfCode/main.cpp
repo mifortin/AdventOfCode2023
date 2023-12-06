@@ -13,4 +13,5 @@ int main(int argc, const char * argv[]) {
 	GenRevDigits();
 	
 	Day01();
+	Day02();
 }
