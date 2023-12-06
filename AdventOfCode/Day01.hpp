@@ -29,5 +29,12 @@ bool EqualsBack(const char*Start, const char* CmpStart, const char* CmpEnd);
 void Day02();
 struct ACString { const char* Start = nullptr; const char* End = nullptr; };
 ACString MakeACString( const char* Start);
-bool ReadNextLine(ACString * Sz);
-void PrintLine(ACString * sz);
+bool ReadNextLine(ACString & Sz);
+void PrintLine(ACString & sz);
+void SkipWhitespace(ACString &sz);
+bool Consume(ACString &sz, const char* String);
+bool Consume(ACString &sz, int &Out);
+
+
+//////////////////////////////
+void Day03();
