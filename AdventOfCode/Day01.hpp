@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <cstring>
 #include <cassert>
+#include <cstdint>
 
 #define ARRAY_LEN(X)	(sizeof(X) / sizeof(X[0]))
 
@@ -45,4 +46,8 @@ void Day03();
 void Day04();
 void SetBit(char* BitField, int Index, bool Value);
 bool IsBitSet(const char* BitField, int Index);
+
+
+//////////////////////////////
+void Day05();
 
