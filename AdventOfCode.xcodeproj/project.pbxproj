@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4C3585142B21420A005036FC /* Day04.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C3585132B21420A005036FC /* Day04.cpp */; };
 		4CA8F2472B1FEE680061E838 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CA8F2462B1FEE680061E838 /* main.cpp */; };
 		4CA8F24F2B1FEEB10061E838 /* Day01.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CA8F24D2B1FEEB10061E838 /* Day01.cpp */; };
 		4CA8F2512B2003750061E838 /* Day02.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CA8F2502B2003750061E838 /* Day02.cpp */; };
@@ -26,6 +27,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		4C3585122B214090005036FC /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		4C3585132B21420A005036FC /* Day04.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Day04.cpp; sourceTree = "<group>"; };
 		4CA8F2432B1FEE680061E838 /* AdventOfCode */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = AdventOfCode; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CA8F2462B1FEE680061E838 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		4CA8F24D2B1FEEB10061E838 /* Day01.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Day01.cpp; sourceTree = "<group>"; };
@@ -48,6 +51,7 @@
 		4CA8F23A2B1FEE680061E838 = {
 			isa = PBXGroup;
 			children = (
+				4C3585122B214090005036FC /* README.md */,
 				4CA8F2452B1FEE680061E838 /* AdventOfCode */,
 				4CA8F2442B1FEE680061E838 /* Products */,
 			);
@@ -69,6 +73,7 @@
 				4CA8F24E2B1FEEB10061E838 /* Day01.hpp */,
 				4CA8F2502B2003750061E838 /* Day02.cpp */,
 				4CA8F2522B2010E00061E838 /* Day03.cpp */,
+				4C3585132B21420A005036FC /* Day04.cpp */,
 			);
 			path = AdventOfCode;
 			sourceTree = "<group>";
@@ -133,6 +138,7 @@
 				4CA8F2472B1FEE680061E838 /* main.cpp in Sources */,
 				4CA8F24F2B1FEEB10061E838 /* Day01.cpp in Sources */,
 				4CA8F2512B2003750061E838 /* Day02.cpp in Sources */,
+				4C3585142B21420A005036FC /* Day04.cpp in Sources */,
 				4CA8F2532B2010E00061E838 /* Day03.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <algorithm>
 #include <cstring>
+#include <cassert>
 
 #define ARRAY_LEN(X)	(sizeof(X) / sizeof(X[0]))
 
@@ -38,3 +39,10 @@ bool Consume(ACString &sz, int &Out);
 
 //////////////////////////////
 void Day03();
+
+
+//////////////////////////////
+void Day04();
+void SetBit(char* BitField, int Index, bool Value);
+bool IsBitSet(const char* BitField, int Index);
+
