@@ -269,24 +269,46 @@ humidity-to-location map:
 237692106 1544133532 42481561
 3696531962 2419093833 100491231)MEOW";
 
-template<typename T>
+template<typename T, int N>
 struct ACArray
 {
-	int64_t Length;
+	ACArray()
+	{
+		Length = 0;
+		Data = new T[N];
+		memset(Data, 0, N*sizeof(T));	// Maybe I shouldn't, but convenient.
+	}
 	
+	ACArray(ACArray&) = delete;
+	~ACArray()
+	{
+		delete[] Data;
+	}
+	
+	int GetLength() { return Length; }
+	
+	T&operator[](int i)
+	{
+		assert(i >= 0 && i < Length);
+		return Data[i];
+	}
+	
+	void Add(const T&Value)
+	{
+		assert(Length < N);
+		Data[Length] = Value;
+		Length++;
+	}
+	
+	T*begin() { return Data; }
+	T*end() { return Data + Length; }
+	
+protected:
+	
+	int Length;
+	
+	T *Data;
 };
-
-void ArrayAddEntry(int64_t* Array, int64_t Value)
-{
-	Array[0]++;
-	Array[Array[0]] = Value;
-}
-
-int64_t* ArrayStart(int64_t* Array)	{ return Array + 1; }
-int64_t* ArrayEnd(int64_t* Array) { return Array + 1 + Array[0]; }
-int64_t ArrayCount(int64_t *Array) { return Array[0]; }
-int64_t ArrayGet(int64_t* Array, int Index) { return Array[1+Index]; }
-void ArraySet(int64_t* Array, int Index, int64_t Value) {Array[1+Index] = Value;}
 
 
 bool Consume(ACString &sz, int64_t &Out)
@@ -309,20 +331,20 @@ bool Consume(ACString &sz, int64_t &Out)
 }
 
 
-struct Range {
+struct ACRange {
 	int64_t Start;
 	int64_t End;
 };
 
-Range MakeRangeFromStartLength(int64_t Start, int64_t Length)
+ACRange MakeRangeFromStartLength(int64_t Start, int64_t Length)
 {
-	return Range{Start, Start + Length-1};	// nb - length of 1 = same start + end.
+	return ACRange{Start, Start + Length-1};	// nb - length of 1 = same start + end.
 }
 
 
-Range RangeIntersect(const Range &A, const Range &B)
+ACRange RangeIntersect(const ACRange &A, const ACRange &B)
 {
-	return Range
+	return ACRange
 	{
 		std::max(A.Start, B.Start),
 		std::min(A.End, B.End)
@@ -330,9 +352,9 @@ Range RangeIntersect(const Range &A, const Range &B)
 }
 
 
-Range RangeLeft(const Range &A, const Range& B)
+ACRange RangeLeft(const ACRange &A, const ACRange& B)
 {
-	return Range
+	return ACRange
 	{
 		std::min(A.Start, B.Start),
 		std::max(A.Start, B.Start)-1
@@ -340,9 +362,9 @@ Range RangeLeft(const Range &A, const Range& B)
 }
 
 
-Range RangeRight(const Range &A, const Range&B)
+ACRange RangeRight(const ACRange &A, const ACRange&B)
 {
-	return Range
+	return ACRange
 	{
 		std::min(A.End, B.End)+1,
 		std::max(A.End, B.End)
@@ -350,158 +372,142 @@ Range RangeRight(const Range &A, const Range&B)
 }
 
 
-bool RangeValid(const Range &A)
+bool RangeValid(const ACRange &A)
 {
 	return A.End >= A.Start;
 }
 
 
-void Day05()
+template<typename T, int N>
+struct ACList
 {
+	ACList()
 	{
-		ACString Sz = MakeACString(Puzzle);
-		
-		ReadNextLine(Sz);
-		Consume(Sz, "seeds:");
-		
-		int64_t Seeds[32] = {0};
-		int64_t NextSeed;
-		while (Consume(Sz, NextSeed))
-			ArrayAddEntry(Seeds, NextSeed);
-		
-		ReadNextLine(Sz);
-		
-		while (ReadNextLine(Sz))
-		{
-			//PrintLine(Sz);
-			
-			char Applied[32] = {0};
-			while (ReadNextLine(Sz))
-			{
-				int64_t RangeDst;
-				int64_t RangeSrc;
-				if (!Consume(Sz, RangeDst))
-					break;
-				
-				Consume(Sz, RangeSrc);
-				
-				int64_t Length;
-				Consume(Sz, Length);
-				
-				//printf("> %i %i %i\n", RangeSrc, RangeDst, Length);
-				
-				for (int i=0; i<ArrayCount(Seeds); i++)
-				{
-					if (IsBitSet(Applied, i))	continue;
-					
-					int64_t CurSeed = ArrayGet(Seeds, i);
-					if (CurSeed >= RangeSrc && CurSeed < RangeSrc + Length)
-					{
-						//printf(">>> %i\n", CurSeed);
-						SetBit(Applied, i, true);
-						CurSeed -= RangeSrc;
-						CurSeed += RangeDst;
-						ArraySet(Seeds, i, CurSeed);
-					}
-				}
-			}
-			
-			//for (int*s = ArrayStart(Seeds); s<ArrayEnd(Seeds); s++)
-			//{
-			//	printf(" - %i ", *s);
-			///}
-			//printf("\n");
-		}
-		
-		int64_t Part01 = INT32_MAX;
-		for (int64_t*s = ArrayStart(Seeds); s<ArrayEnd(Seeds); s++)
-		{
-			Part01 = std::min(Part01, *s);
-		}
-		
-		printf("Day 5 Part 1: %lli\n", Part01);
+		DataList = 0;
+		for (int i=0; i<N-1; i++)
+			Links[i] = i+1;
+		Links[N-1] = -1;
 	}
 	
-	// Part 2 is a bit radically different...
+	void AddFront(const T& NewData)
 	{
-		ACString Sz = MakeACString(Puzzle);
+		int mine = GetNextEmpty();
+		Links[mine] = DataList;
+		Data[mine] = NewData;
+	}
+	
+	bool IsEmpty() { return DataList == -1;}
+	
+	int GetNextEmpty()
+	{
+		assert(EmptyList != -1);
 		
-		ReadNextLine(Sz);
-		Consume(Sz, "seeds:");
-		
-		int64_t Seeds[2048*8] = {0};
-		int64_t NextSeed;
-		while (Consume(Sz, NextSeed))
-			ArrayAddEntry(Seeds, NextSeed);
-		
-		ReadNextLine(Sz);
+		int Mine = EmptyList;
+		EmptyList = Links[EmptyList];
+		return Mine;
+	}
+	
+	friend struct Iter;
+	
+	ACArray<T, N>	Data;
+	ACArray<int, N>	Links;
+	
+	int DataList = -1;
+	int EmptyList = -1;
+};
+
+
+template<int N>
+struct ACRangeList
+{
+	void AddRange(ACRange& Range)
+	{
+		if (Data.IsEmpty())
+			Data.AddFront(Range);
+		else
+		{
+			for (auto iter=Data.begin(); iter != Data.end(); iter++)
+			{
+				if (RangeValid( RangeIntersect(Range, *iter)))
+				{
+					// merge.
+				}
+			}
+		}
+	}
+	
+protected:
+	ACList<ACRange, N> Data;
+};
+
+
+void Day05(bool mode)
+{
+	ACString Sz = MakeACString(Sample);
+	
+	ReadNextLine(Sz);
+	Consume(Sz, "seeds:");
+	
+	ACRangeList<2048> Seeds;
+	int64_t NextSeed;
+	while (Consume(Sz, NextSeed))
+	{
+	}
+	
+	ReadNextLine(Sz);
+	
+	
+	while (ReadNextLine(Sz))
+	{
+		//PrintLine(Sz);
 		
 		while (ReadNextLine(Sz))
 		{
-			//PrintLine(Sz);
+			int64_t RangeDst;
+			int64_t RangeSrc;
+			if (!Consume(Sz, RangeDst))
+				break;
 			
-			char Applied[2048] = {0};
-			while (ReadNextLine(Sz))
+			Consume(Sz, RangeSrc);
+			
+			int64_t Length;
+			Consume(Sz, Length);
+			
+			//printf("> %i %i %i\n", RangeSrc, RangeDst, Length);
+			
+			for (int i=0; i<Seeds.GetLength(); i++)
 			{
-				int64_t RangeDst;
-				int64_t RangeSrc;
-				if (!Consume(Sz, RangeDst))
-					break;
-				
-				Consume(Sz, RangeSrc);
-				
-				int64_t Length;
-				Consume(Sz, Length);
-				
-				Range SrcRange = MakeRangeFromStartLength(RangeSrc, Length);
-				
-				//printf("> %i %i %i\n", RangeSrc, RangeDst, Length);
-				
-				for (int i=0; i<ArrayCount(Seeds); i+=2)
+				int64_t CurSeed = Seeds[i];
+				if (CurSeed >= RangeSrc && CurSeed < RangeSrc + Length)
 				{
-					if (IsBitSet(Applied, i))	continue;
-					
-					int64_t CurSeed = ArrayGet(Seeds, i);
-					int64_t CurSeedLen = ArrayGet(Seeds, i+1);
-					
-					
-					
-					if (CurSeed >= RangeSrc && CurSeed + CurSeedLen <= RangeSrc + Length)
-					{
-						//printf(">>> %i\n", CurSeed);
-						SetBit(Applied, i, true);
-						CurSeed -= RangeSrc;
-						CurSeed += RangeDst;
-						ArraySet(Seeds, i, CurSeed);
-					}
-					else if (CurSeed >= RangeSrc && CurSeed < RangeSrc + Length)
-					{
-						ArrayAddEntry(Seeds, RangeSrc + Length);
-						ArrayAddEntry(Seeds, CurSeedLen - (RangeSrc + Length));
-						ArraySet(Seeds, i, CurSeed);
-					}
-					else if (CurSeed + CurSeedLen-1 >= RangeSrc
-							 && CurSeed + CurSeedLen <= RangeSrc)
-					{
-						
-						ArraySet(Seeds, i, CurSeed);
-					}
+					//printf(">>> %i\n", CurSeed);
+					CurSeed -= RangeSrc;
+					CurSeed += RangeDst;
+					Seeds[i] = CurSeed;
 				}
 			}
-			
-			//for (int*s = ArrayStart(Seeds); s<ArrayEnd(Seeds); s++)
-			//{
-			//	printf(" - %i ", *s);
-			///}
-			//printf("\n");
 		}
 		
-		int64_t Part01 = INT32_MAX;
-		for (int64_t*s = ArrayStart(Seeds); s<ArrayEnd(Seeds); s++)
-		{
-			Part01 = std::min(Part01, *s);
-		}
-		
-		printf("Day 5 Part 1: %lli\n", Part01);
+		//for (int*s = ArrayStart(Seeds); s<ArrayEnd(Seeds); s++)
+		//{
+		//	printf(" - %i ", *s);
+		///}
+		//printf("\n");
 	}
+	
+	int64_t Part01 = INT32_MAX;
+	for (int64_t s : Seeds)
+	{
+		Part01 = std::min(Part01, s);
+	}
+	
+	// Should be 111627841 for part 1
+	printf("Day 5 Part %i: %lli\n", mode? 1:0, Part01);
+}
+
+
+void Day05()
+{
+	Day05(false);
+	Day05(true);
 }
