@@ -332,17 +332,26 @@ bool Consume(ACString &sz, int64_t &Out)
 
 
 struct ACRange {
+	static ACRange FromStartLength(int64_t Start, int64_t Length);
+	static ACRange Intersect(const ACRange& A, const ACRange&B);
+	static ACRange Left(const ACRange& A, const ACRange&B);
+	static ACRange Right(const ACRange& A, const ACRange&B);
+	static ACRange Union(const ACRange &A, const ACRange&B);
+	
+	bool IsValid();
+	
 	int64_t Start;
 	int64_t End;
 };
 
-ACRange MakeRangeFromStartLength(int64_t Start, int64_t Length)
+
+ACRange ACRange::FromStartLength(int64_t Start, int64_t Length)
 {
 	return ACRange{Start, Start + Length-1};	// nb - length of 1 = same start + end.
 }
 
 
-ACRange RangeIntersect(const ACRange &A, const ACRange &B)
+ACRange ACRange::Intersect(const ACRange &A, const ACRange &B)
 {
 	return ACRange
 	{
@@ -352,7 +361,7 @@ ACRange RangeIntersect(const ACRange &A, const ACRange &B)
 }
 
 
-ACRange RangeLeft(const ACRange &A, const ACRange& B)
+ACRange ACRange::Left(const ACRange &A, const ACRange& B)
 {
 	return ACRange
 	{
@@ -362,7 +371,7 @@ ACRange RangeLeft(const ACRange &A, const ACRange& B)
 }
 
 
-ACRange RangeRight(const ACRange &A, const ACRange&B)
+ACRange ACRange::Right(const ACRange &A, const ACRange&B)
 {
 	return ACRange
 	{
@@ -372,72 +381,134 @@ ACRange RangeRight(const ACRange &A, const ACRange&B)
 }
 
 
-bool RangeValid(const ACRange &A)
+ACRange ACRange::Union(const ACRange& A, const ACRange &B)
 {
-	return A.End >= A.Start;
+	ACRange ACopy = ACRange{A.Start-1, A.End+1};
+	
+	if (Intersect(ACopy, B).IsValid())
+	{
+		return ACRange{std::min(A.Start, B.Start), std::max(A.End, B.End)};
+	}
+	else
+		return ACRange{1,0};
 }
 
 
-template<typename T, int N>
-struct ACList
+bool ACRange::IsValid()
 {
-	ACList()
-	{
-		DataList = 0;
-		for (int i=0; i<N-1; i++)
-			Links[i] = i+1;
-		Links[N-1] = -1;
-	}
-	
-	void AddFront(const T& NewData)
-	{
-		int mine = GetNextEmpty();
-		Links[mine] = DataList;
-		Data[mine] = NewData;
-	}
-	
-	bool IsEmpty() { return DataList == -1;}
-	
-	int GetNextEmpty()
-	{
-		assert(EmptyList != -1);
-		
-		int Mine = EmptyList;
-		EmptyList = Links[EmptyList];
-		return Mine;
-	}
-	
-	friend struct Iter;
-	
-	ACArray<T, N>	Data;
-	ACArray<int, N>	Links;
-	
-	int DataList = -1;
-	int EmptyList = -1;
-};
+	return End >= Start;
+}
 
 
+// I'd template this; however merging is so specific to ranges that I'll leave it
+// as is.
 template<int N>
-struct ACRangeList
+struct ACRangeTree
 {
-	void AddRange(ACRange& Range)
+	ACRangeTree()
 	{
-		if (Data.IsEmpty())
-			Data.AddFront(Range);
-		else
+		for (int i=0; i<N-1; i++)
 		{
-			for (auto iter=Data.begin(); iter != Data.end(); iter++)
+			Pointers[i].Left = i+1;
+			Pointers[i].Right = i+1;
+		}
+	}
+	
+	int AddRangeNewNode(ACRange Range)
+	{
+		int ptr = TakePointer();
+		Pointers[ptr] = Pointer();
+		Ranges[ptr] = Range;
+	}
+	
+	void HandleUnion(int Index)
+	{
+		int LeftIndex = Pointers[Index].Left;
+		int RightIndex = Pointers[Index].Right;
+		if (LeftIndex != -1)
+		{
+			ACRange Union = ACRange::Union(Ranges[Index], Ranges[LeftIndex]);
+			
+			if (Union.IsValid())
 			{
-				if (RangeValid( RangeIntersect(Range, *iter)))
+				Ranges[Index] = Union;
+				
+				Pointers[Index].Left;
+			}
+		}
+		if (RightIndex != -1)
+		{
+			
+		}
+	}
+	
+	void AddRange(ACRange Range)
+	{
+		if (Root == -1)
+		{
+			Root = AddRangeNewNode(Range);
+			return;
+		}
+		
+		int start = Root;
+		
+		for (;;)
+		{
+			ACRange Union = ACRange::Union(Ranges[start], Range);
+			if (Union.IsValid())
+			{
+				Ranges[start] = Union;
+				HandleUnion(start);
+				return;
+			}
+			else
+			{
+				if (Ranges[start].Start < Range.Start)
 				{
-					// merge.
+					if (Pointers[start].Left == -1)
+					{
+						Pointers[start].Left = AddRangeNewNode(Range);
+						return;
+					}
+					else
+						start = Pointers[start].Left;
+				}
+				else if (Ranges[start].End > Range.End)
+				{
+					if (Pointers[start].Right == -1)
+					{
+						Pointers[start].Right = AddRangeNewNode(Range);
+						return;
+					}
+					else
+						start = Pointers[start].Right;
+				}
+				else
+				{
+					assert(0);
 				}
 			}
 		}
 	}
 	
-protected:
-	ACList<ACRange, N> Data;
+	int TakePointer()
+	{
+		assert(Free != -1);
+		int R = Free;
+		Free = Pointers[Free].Left;
+	}
+	
+	struct Pointer
+	{
+		int Left = -1;
+		int Right = -1;
+	};
+	
+	ACArray<Pointer, N>	Pointers;
+	ACArray<ACRange, N> Ranges;
+	
+	int Root = -1;
+	int Free = 0;
 };
 
 
@@ -448,10 +519,18 @@ void Day05(bool mode)
 	ReadNextLine(Sz);
 	Consume(Sz, "seeds:");
 	
-	ACRangeList<2048> Seeds;
+	ACRangeTree<2048> Seeds;
 	int64_t NextSeed;
 	while (Consume(Sz, NextSeed))
 	{
+		if (mode)
+		{
+			int64_t Length;
+			Consume(Sz, Length);
+			Seeds.AddRange(ACRange::FromStartLength(NextSeed, Length));
+		}
+		else
+			Seeds.AddRange(ACRange::FromStartLength(NextSeed, 1));
 	}
 	
 	ReadNextLine(Sz);
