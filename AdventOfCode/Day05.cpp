@@ -269,74 +269,6 @@ humidity-to-location map:
 237692106 1544133532 42481561
 3696531962 2419093833 100491231)MEOW";
 
-template<typename T>
-struct ACArray
-{
-	ACArray(int InMax)
-	{
-		Max = InMax;
-		Length = 0;
-		Data = new T[Max];
-		memset(Data, 0, Max*sizeof(T));	// Maybe I shouldn't, but convenient.
-	}
-	
-	ACArray(ACArray&) = delete;
-	~ACArray()
-	{
-		delete[] Data;
-	}
-	
-	int GetLength() { return Length; }
-	
-	T&operator[](int i)
-	{
-		assert(i >= 0 && i < Length);
-		return Data[i];
-	}
-	
-	void Add(const T&Value)
-	{
-		assert(Length < Max);
-		Data[Length] = Value;
-		Length++;
-	}
-	
-	void Delete(int index)
-	{
-		assert(index >=0 && index < Length);
-		Length--;
-		for (int i=index; i<Length; i++)
-		{
-			Data[i] = Data[i+1];
-		}
-	}
-	
-	T*begin() { return Data; }
-	T*end() { return Data + Length; }
-	
-	static void swap(ACArray<T> & A, ACArray<T> &B)
-	{
-		std::swap(A.Length, B.Length);
-		std::swap(A.Max, B.Max);
-		std::swap(A.Data, B.Data);
-	}
-	
-protected:
-	
-	int Length;
-	int Max;
-	
-	T *Data;
-};
-
-namespace std {
-	template<typename T>
-	void swap(ACArray<T> & A, ACArray<T> &B)
-	{
-		ACArray<T>::swap(A, B);
-	}
-}
-
 
 bool Consume(ACString &sz, int64_t &Out)
 {
@@ -356,20 +288,6 @@ bool Consume(ACString &sz, int64_t &Out)
 	
 	return true;
 }
-
-
-struct ACRange {
-	static ACRange FromStartLength(int64_t Start, int64_t Length);
-	static ACRange Intersect(const ACRange& A, const ACRange&B);
-	static ACRange Left(const ACRange& A, const ACRange&B);
-	static ACRange Right(const ACRange& A, const ACRange&B);
-	static ACRange Union(const ACRange &A, const ACRange&B);
-	
-	bool IsValid();
-	
-	int64_t Start;
-	int64_t End;
-};
 
 
 ACRange ACRange::FromStartLength(int64_t Start, int64_t Length)
@@ -425,35 +343,6 @@ bool ACRange::IsValid()
 {
 	return End >= Start;
 }
-
-
-struct ACRangeArray : public ACArray<ACRange>
-{
-	ACRangeArray(int MaxSize) : ACArray<ACRange>(MaxSize) {}
-	
-	void AddRange(ACRange Range)
-	{
-		Add(Range);
-		
-		int CurIndex = GetLength() - 1;
-		while (CurIndex > 0)
-		{
-			ACRange Merged = ACRange::Union(Data[CurIndex], Data[CurIndex-1]);
-			
-			if (Merged.IsValid())
-			{
-				Data[CurIndex-1] = Merged;
-				Delete(CurIndex);
-			}
-			else if (Data[CurIndex-1].Start < Data[CurIndex].Start)
-				return;
-			
-			std::swap(Data[CurIndex-1], Data[CurIndex]);
-			
-			CurIndex--;
-		}
-	}
-};
 
 
 void Day05(bool mode)

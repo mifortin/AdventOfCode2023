@@ -18,3 +18,7 @@ This means when I parse, I copy a string (which is just a view), and then the pa
 ## Bitsets
 The functions take in a char array.  This allows the array to exist on the stack and be default inited to 0.  Either set or test.  Brought to you by Day 4's puzzle
 
+## Arrays
+Caved, now am using templates.  Arrays have a maximum fixed size.  O(n) everything!  Invoke ACArray.
+
+Most important result of day 5 is the range operations + range array.  These allow adding a range while maintaining sorting order - and merges ranges as need be.  This allows day 5 to run spectacularly fast.  See ACRange and ACRangeArray.
