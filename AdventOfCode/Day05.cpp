@@ -269,14 +269,15 @@ humidity-to-location map:
 237692106 1544133532 42481561
 3696531962 2419093833 100491231)MEOW";
 
-template<typename T, int N>
+template<typename T>
 struct ACArray
 {
-	ACArray()
+	ACArray(int InMax)
 	{
+		Max = InMax;
 		Length = 0;
-		Data = new T[N];
-		memset(Data, 0, N*sizeof(T));	// Maybe I shouldn't, but convenient.
+		Data = new T[Max];
+		memset(Data, 0, Max*sizeof(T));	// Maybe I shouldn't, but convenient.
 	}
 	
 	ACArray(ACArray&) = delete;
@@ -295,20 +296,46 @@ struct ACArray
 	
 	void Add(const T&Value)
 	{
-		assert(Length < N);
+		assert(Length < Max);
 		Data[Length] = Value;
 		Length++;
+	}
+	
+	void Delete(int index)
+	{
+		assert(index >=0 && index < Length);
+		Length--;
+		for (int i=index; i<Length; i++)
+		{
+			Data[i] = Data[i+1];
+		}
 	}
 	
 	T*begin() { return Data; }
 	T*end() { return Data + Length; }
 	
+	static void swap(ACArray<T> & A, ACArray<T> &B)
+	{
+		std::swap(A.Length, B.Length);
+		std::swap(A.Max, B.Max);
+		std::swap(A.Data, B.Data);
+	}
+	
 protected:
 	
 	int Length;
+	int Max;
 	
 	T *Data;
 };
+
+namespace std {
+	template<typename T>
+	void swap(ACArray<T> & A, ACArray<T> &B)
+	{
+		ACArray<T>::swap(A, B);
+	}
+}
 
 
 bool Consume(ACString &sz, int64_t &Out)
@@ -400,126 +427,44 @@ bool ACRange::IsValid()
 }
 
 
-// I'd template this; however merging is so specific to ranges that I'll leave it
-// as is.
-template<int N>
-struct ACRangeTree
+struct ACRangeArray : public ACArray<ACRange>
 {
-	ACRangeTree()
-	{
-		for (int i=0; i<N-1; i++)
-		{
-			Pointers[i].Left = i+1;
-			Pointers[i].Right = i+1;
-		}
-	}
-	
-	int AddRangeNewNode(ACRange Range)
-	{
-		int ptr = TakePointer();
-		Pointers[ptr] = Pointer();
-		Ranges[ptr] = Range;
-	}
-	
-	void HandleUnion(int Index)
-	{
-		int LeftIndex = Pointers[Index].Left;
-		int RightIndex = Pointers[Index].Right;
-		if (LeftIndex != -1)
-		{
-			ACRange Union = ACRange::Union(Ranges[Index], Ranges[LeftIndex]);
-			
-			if (Union.IsValid())
-			{
-				Ranges[Index] = Union;
-				
-				Pointers[Index].Left;
-			}
-		}
-		if (RightIndex != -1)
-		{
-			
-		}
-	}
+	ACRangeArray(int MaxSize) : ACArray<ACRange>(MaxSize) {}
 	
 	void AddRange(ACRange Range)
 	{
-		if (Root == -1)
-		{
-			Root = AddRangeNewNode(Range);
-			return;
-		}
+		Add(Range);
 		
-		int start = Root;
-		
-		for (;;)
+		int CurIndex = GetLength() - 1;
+		while (CurIndex > 0)
 		{
-			ACRange Union = ACRange::Union(Ranges[start], Range);
-			if (Union.IsValid())
+			ACRange Merged = ACRange::Union(Data[CurIndex], Data[CurIndex-1]);
+			
+			if (Merged.IsValid())
 			{
-				Ranges[start] = Union;
-				HandleUnion(start);
+				Data[CurIndex-1] = Merged;
+				Delete(CurIndex);
+			}
+			else if (Data[CurIndex-1].Start < Data[CurIndex].Start)
 				return;
-			}
-			else
-			{
-				if (Ranges[start].Start < Range.Start)
-				{
-					if (Pointers[start].Left == -1)
-					{
-						Pointers[start].Left = AddRangeNewNode(Range);
-						return;
-					}
-					else
-						start = Pointers[start].Left;
-				}
-				else if (Ranges[start].End > Range.End)
-				{
-					if (Pointers[start].Right == -1)
-					{
-						Pointers[start].Right = AddRangeNewNode(Range);
-						return;
-					}
-					else
-						start = Pointers[start].Right;
-				}
-				else
-				{
-					assert(0);
-				}
-			}
+			
+			std::swap(Data[CurIndex-1], Data[CurIndex]);
+			
+			CurIndex--;
 		}
 	}
-	
-	int TakePointer()
-	{
-		assert(Free != -1);
-		int R = Free;
-		Free = Pointers[Free].Left;
-	}
-	
-	struct Pointer
-	{
-		int Left = -1;
-		int Right = -1;
-	};
-	
-	ACArray<Pointer, N>	Pointers;
-	ACArray<ACRange, N> Ranges;
-	
-	int Root = -1;
-	int Free = 0;
 };
 
 
 void Day05(bool mode)
 {
-	ACString Sz = MakeACString(Sample);
+	ACString Sz = MakeACString(Puzzle);
 	
 	ReadNextLine(Sz);
 	Consume(Sz, "seeds:");
 	
-	ACRangeTree<2048> Seeds;
+	ACRangeArray NextSeeds(2048);
+	ACRangeArray Seeds(2048);
 	int64_t NextSeed;
 	while (Consume(Sz, NextSeed))
 	{
@@ -532,6 +477,11 @@ void Day05(bool mode)
 		else
 			Seeds.AddRange(ACRange::FromStartLength(NextSeed, 1));
 	}
+	
+	//for (ACRange Ranges : Seeds)
+	//{
+	//	printf(" > %lli %lli\n", Ranges.Start, Ranges.End);
+	//}
 	
 	ReadNextLine(Sz);
 	
@@ -552,36 +502,64 @@ void Day05(bool mode)
 			int64_t Length;
 			Consume(Sz, Length);
 			
-			//printf("> %i %i %i\n", RangeSrc, RangeDst, Length);
+			//printf("> %lli %lli %lli\n", RangeSrc, RangeDst, Length);
+			ACRange SrcRange = ACRange::FromStartLength(RangeSrc, Length);
 			
 			for (int i=0; i<Seeds.GetLength(); i++)
 			{
-				int64_t CurSeed = Seeds[i];
-				if (CurSeed >= RangeSrc && CurSeed < RangeSrc + Length)
+				ACRange CurSeed = Seeds[i];
+				ACRange Left = ACRange::Left(CurSeed, SrcRange);
+				ACRange Right = ACRange::Right(CurSeed, SrcRange);
+				ACRange Common = ACRange::Intersect(CurSeed, SrcRange);
+				
+				Left = ACRange::Intersect(Left, CurSeed);
+				Right = ACRange::Intersect(Right, CurSeed);
+				
+				if (Common.IsValid())
 				{
-					//printf(">>> %i\n", CurSeed);
-					CurSeed -= RangeSrc;
-					CurSeed += RangeDst;
-					Seeds[i] = CurSeed;
+					Common.Start -= RangeSrc;
+					Common.End -= RangeSrc;
+					Common.Start += RangeDst;
+					Common.End += RangeDst;
+					NextSeeds.AddRange(Common);
+					
+					Seeds.Delete(i);
+					i--;
+					if (Left.IsValid())
+					{
+						Seeds.AddRange(Left);
+					}
+					if (Right.IsValid())
+					{
+						Seeds.AddRange(Right);
+					}
 				}
 			}
+			
+		}
+		for (int i = Seeds.GetLength()-1; i>=0; i--)
+		{
+			NextSeeds.AddRange(Seeds[i]);
+			Seeds.Delete(i);
 		}
 		
-		//for (int*s = ArrayStart(Seeds); s<ArrayEnd(Seeds); s++)
+		std::swap(Seeds, NextSeeds);
+		
+		
+		//for (ACRange Ranges : Seeds)
 		//{
-		//	printf(" - %i ", *s);
-		///}
-		//printf("\n");
+		//	printf(" > %lli %lli\n", Ranges.Start, Ranges.End);
+		//}
 	}
 	
 	int64_t Part01 = INT32_MAX;
-	for (int64_t s : Seeds)
+	for (ACRange s : Seeds)
 	{
-		Part01 = std::min(Part01, s);
+		Part01 = std::min(Part01, s.Start);
 	}
 	
 	// Should be 111627841 for part 1
-	printf("Day 5 Part %i: %lli\n", mode? 1:0, Part01);
+	printf("Day 5 Part %i: %lli\n", mode? 2:1, Part01);
 }
 
 
