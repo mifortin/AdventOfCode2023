@@ -159,3 +159,7 @@ struct ACRangeArray : public ACArray<ACRange>
 		}
 	}
 };
+
+
+//////////////////////////////
+void Day06();
