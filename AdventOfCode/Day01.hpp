@@ -50,6 +50,7 @@ bool IsBitSet(const char* BitField, int Index);
 
 //////////////////////////////
 void Day05();
+bool Consume(ACString &sz, int64_t &Out);
 struct ACRange {
 	static ACRange FromStartLength(int64_t Start, int64_t Length);
 	static ACRange Intersect(const ACRange& A, const ACRange&B);
@@ -163,3 +164,4 @@ struct ACRangeArray : public ACArray<ACRange>
 
 //////////////////////////////
 void Day06();
+bool ConsumeSkipWhitespace(ACString &sz, int64_t &Out);
