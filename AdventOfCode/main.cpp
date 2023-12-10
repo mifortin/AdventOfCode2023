@@ -18,4 +18,5 @@ int main(int argc, const char * argv[]) {
 	Day04();
 	Day05();
 	Day06();
+	Day07();
 }

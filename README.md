@@ -22,3 +22,7 @@ The functions take in a char array.  This allows the array to exist on the stack
 Caved, now am using templates.  Arrays have a maximum fixed size.  O(n) everything!  Invoke ACArray.
 
 Most important result of day 5 is the range operations + range array.  These allow adding a range while maintaining sorting order - and merges ranges as need be.  This allows day 5 to run spectacularly fast.  See ACRange and ACRangeArray.
+
+If the type in the array has a "Consume" to parse the value, then you can consume the array and it will read it in easily.
+
+There's Quicksort - be sure that less then and greater than are both implemented.

@@ -29,7 +29,12 @@ bool EqualsBack(const char*Start, const char* CmpStart, const char* CmpEnd);
 
 //////////////////////////////
 void Day02();
-struct ACString { const char* Start = nullptr; const char* End = nullptr; };
+struct ACString
+{ const char* Start = nullptr; const char* End = nullptr;
+	const char* begin() { return Start; }
+	const char* end() { return End; }
+	size_t Length() { return (size_t)(End - Start); }
+};
 ACString MakeACString( const char* Start);
 bool ReadNextLine(ACString & Sz);
 void PrintLine(ACString & sz);
@@ -40,6 +45,7 @@ bool Consume(ACString &sz, int &Out);
 
 //////////////////////////////
 void Day03();
+bool IsNumeric(char c);
 
 
 //////////////////////////////
@@ -116,6 +122,8 @@ struct ACArray
 		std::swap(A.Data, B.Data);
 	}
 	
+	void Empty() { Length = 0; }
+	
 protected:
 	
 	int Length;
@@ -165,3 +173,69 @@ struct ACRangeArray : public ACArray<ACRange>
 //////////////////////////////
 void Day06();
 bool ConsumeSkipWhitespace(ACString &sz, int64_t &Out);
+
+template<typename T>
+void Consume(ACString&Sz, ACArray<T> &Target)
+{
+	T Temp;
+	while (Consume(Sz, Temp))
+		Target.Add(Temp);
+}
+
+
+//////////////////////////////
+void Day07();
+bool IsAlpha(char a);
+bool Consume(ACString &Src, ACString &Dst);
+
+template<typename T>
+auto QuickSort_Internal(ACArray<T>& ToSort, int start, int end)
+{
+	if (end == start + 1)
+	{
+		if (ToSort[start] > ToSort[end])
+			std::swap(ToSort[start], ToSort[end]);
+		return;
+	}
+	
+	int mid = (start + end) / 2;
+	if (mid != end) std::swap(ToSort[mid], ToSort[end]);
+	T &MidValue = ToSort[end];
+	
+	int send = end - 1;
+	int sstart = start;
+	
+	while (send > sstart)
+	{
+		while (ToSort[send] > MidValue && send >= start)
+			send--;
+		
+		while (ToSort[sstart] < MidValue && sstart <= end-1)
+			sstart++;
+		
+		if (sstart < send)
+			std::swap(ToSort[sstart], ToSort[send]);
+		else
+			break;
+	}
+	send++;
+	if (end != send)
+	{
+		std::swap(ToSort[send], ToSort[end]);
+	}
+	
+	sstart--;
+	if (start < sstart)	QuickSort_Internal(ToSort, start, sstart);
+	
+	if (end > send)	QuickSort_Internal(ToSort, send, end);
+};
+
+template<typename T>
+void Quicksort(ACArray<T> &ToSort)
+{
+	
+	if (ToSort.GetLength() > 1)
+	{
+		QuickSort_Internal(ToSort, 0, ToSort.GetLength() - 1);
+	}
+}

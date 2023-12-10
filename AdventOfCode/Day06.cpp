@@ -16,14 +16,6 @@ R"MEOW(Time:        62     64     91     90
 Distance:   553   1010   1473   1074)MEOW";
 
 
-template<typename T>
-void Consume(ACString&Sz, ACArray<T> &Target)
-{
-	T Temp;
-	while (Consume(Sz, Temp))
-		Target.Add(Temp);
-}
-
 bool ConsumeSkipWhitespace(ACString &sz, int64_t &Out)
 {
 	SkipWhitespace(sz);
