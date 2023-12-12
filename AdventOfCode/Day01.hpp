@@ -34,6 +34,7 @@ struct ACString
 	const char* begin() { return Start; }
 	const char* end() { return End; }
 	size_t Length() { return (size_t)(End - Start); }
+	const char& operator[](int i) { assert(i >= 0 && i < Length()); return Start[i]; }
 };
 ACString MakeACString( const char* Start);
 bool ReadNextLine(ACString & Sz);
@@ -207,7 +208,7 @@ auto QuickSort_Internal(ACArray<T>& ToSort, int start, int end)
 	
 	while (send > sstart)
 	{
-		while (ToSort[send] > MidValue && send >= start)
+		while (ToSort[send] > MidValue && send >= start && send > 0)
 			send--;
 		
 		while (ToSort[sstart] < MidValue && sstart <= end-1)
@@ -239,3 +240,7 @@ void Quicksort(ACArray<T> &ToSort)
 		QuickSort_Internal(ToSort, 0, ToSort.GetLength() - 1);
 	}
 }
+
+
+//////////////////////////////
+void Day08();

@@ -11,6 +11,7 @@
 		4C3585162B214C44005036FC /* Day05.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C3585152B214C44005036FC /* Day05.cpp */; };
 		4C3585182B25FED0005036FC /* Day06.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C3585172B25FED0005036FC /* Day06.cpp */; };
 		4C35851A2B262431005036FC /* Day07.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C3585192B262431005036FC /* Day07.cpp */; };
+		4C35851C2B2681FD005036FC /* Day08.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4C35851B2B2681FD005036FC /* Day08.cpp */; };
 		4CA8F2472B1FEE680061E838 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CA8F2462B1FEE680061E838 /* main.cpp */; };
 		4CA8F24F2B1FEEB10061E838 /* Day01.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CA8F24D2B1FEEB10061E838 /* Day01.cpp */; };
 		4CA8F2512B2003750061E838 /* Day02.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4CA8F2502B2003750061E838 /* Day02.cpp */; };
@@ -35,6 +36,7 @@
 		4C3585152B214C44005036FC /* Day05.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Day05.cpp; sourceTree = "<group>"; };
 		4C3585172B25FED0005036FC /* Day06.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Day06.cpp; sourceTree = "<group>"; };
 		4C3585192B262431005036FC /* Day07.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Day07.cpp; sourceTree = "<group>"; };
+		4C35851B2B2681FD005036FC /* Day08.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Day08.cpp; sourceTree = "<group>"; };
 		4CA8F2432B1FEE680061E838 /* AdventOfCode */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = AdventOfCode; sourceTree = BUILT_PRODUCTS_DIR; };
 		4CA8F2462B1FEE680061E838 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		4CA8F24D2B1FEEB10061E838 /* Day01.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Day01.cpp; sourceTree = "<group>"; };
@@ -83,6 +85,7 @@
 				4C3585152B214C44005036FC /* Day05.cpp */,
 				4C3585172B25FED0005036FC /* Day06.cpp */,
 				4C3585192B262431005036FC /* Day07.cpp */,
+				4C35851B2B2681FD005036FC /* Day08.cpp */,
 			);
 			path = AdventOfCode;
 			sourceTree = "<group>";
@@ -149,6 +152,7 @@
 				4CA8F2512B2003750061E838 /* Day02.cpp in Sources */,
 				4C3585142B21420A005036FC /* Day04.cpp in Sources */,
 				4C3585182B25FED0005036FC /* Day06.cpp in Sources */,
+				4C35851C2B2681FD005036FC /* Day08.cpp in Sources */,
 				4CA8F2532B2010E00061E838 /* Day03.cpp in Sources */,
 				4C3585162B214C44005036FC /* Day05.cpp in Sources */,
 				4C35851A2B262431005036FC /* Day07.cpp in Sources */,
